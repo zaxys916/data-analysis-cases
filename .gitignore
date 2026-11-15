@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# 数据文件（约 200MB，从 Kaggle 下载还原，见 README）
+源数据/
+data/
+archive.zip
+
+# IDE
+.vscode/
+.idea/
+.trae/
+
+# 系统文件
+Thumbs.db
+.DS_Store
+
+# Trae 临时分享包
+.trae-html-share-packages/
