@@ -1,21 +1,29 @@
-# Python
-__pycache__/
-*.pyc
-.venv/
-
-# 数据文件（约 200MB，从 Kaggle 下载还原，见 README）
+# 数据文件（体积大，不入库）
+*.csv
+*.zip
+*.parquet
+*.db
 源数据/
 data/
 archive.zip
 
-# IDE
-.vscode/
-.idea/
+# Python 环境与缓存
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# 前端依赖与构建产物
+node_modules/
+dist/
+
+# 工具与临时产物
+.screenshots/
+.trae-html-share-packages/
 .trae/
+.vscode/
+*.log
 
 # 系统文件
-Thumbs.db
 .DS_Store
-
-# Trae 临时分享包
-.trae-html-share-packages/
+Thumbs.db
