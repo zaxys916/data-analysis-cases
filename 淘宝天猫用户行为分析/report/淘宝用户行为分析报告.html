@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>淘宝用户行为分析报告</title>
+<style>
+  :root {
+    --ink: #1c1c1c;
+    --muted: #6b6b6b;
+    --line: #e6e2dc;
+    --bg: #fbfaf8;
+    --card: #ffffff;
+    --accent: #3b6ea5;
+    --accent-soft: #dbe6f1;
+    --warn: #b4493f;
+    --warm: #d98841;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    line-height: 1.75;
+    font-size: 15px;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 56px 28px 80px; }
+  header { border-bottom: 2px solid var(--ink); padding-bottom: 24px; margin-bottom: 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: .18em; color: var(--muted); text-transform: uppercase; margin-bottom: 12px; }
+  h1 { font-size: 34px; line-height: 1.3; margin: 0 0 14px; font-weight: 700; letter-spacing: -.5px; }
+  .lede { color: var(--muted); font-size: 15px; margin: 0; max-width: 720px; }
+  h2 { font-size: 21px; margin: 56px 0 6px; font-weight: 700; }
+  h2 .idx { color: var(--warm); font-size: 14px; margin-right: 10px; font-weight: 600; }
+  h3 { font-size: 16px; margin: 30px 0 8px; }
+  p { margin: 10px 0; }
+  .sub { color: var(--muted); font-size: 13.5px; margin: 0 0 20px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 28px 0 8px; }
+  .kpi { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .kpi .label { font-size: 12.5px; color: var(--muted); margin-bottom: 6px; }
+  .kpi .value { font-size: 26px; font-weight: 700; letter-spacing: -.5px; }
+  .kpi .unit { font-size: 13px; color: var(--muted); font-weight: 400; margin-left: 3px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 22px 24px; margin: 18px 0; }
+  svg { display: block; width: 100%; height: auto; }
+  .legend { display: flex; gap: 20px; font-size: 12.5px; color: var(--muted); margin-top: 10px; }
+  .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; }
+  .note { border-left: 3px solid var(--warn); background: #fdf6f4; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 14px; }
+  .note strong { color: var(--warn); }
+  .takeaway { border-left: 3px solid var(--accent); background: #f4f8fc; padding: 14px 18px; border-radius: 0 8px 8px 0; margin: 20px 0; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; margin: 16px 0; font-variant-numeric: tabular-nums; }
+  th, td { padding: 9px 10px; border-bottom: 1px solid var(--line); text-align: right; }
+  th:first-child, td:first-child { text-align: left; }
+  thead th { color: var(--muted); font-weight: 600; border-bottom: 1px solid var(--ink); font-size: 12.5px; }
+  tbody tr:last-child td { border-bottom: none; }
+  .funnel-row { display: grid; grid-template-columns: 116px 1fr 152px; align-items: center; gap: 12px; margin: 10px 0; }
+  .funnel-row .name { font-size: 13.5px; color: var(--muted); }
+  .funnel-track { background: #f0ede8; border-radius: 6px; height: 34px; position: relative; overflow: hidden; }
+  .funnel-fill { height: 100%; border-radius: 6px; }
+  .funnel-row .val { font-size: 13.5px; font-variant-numeric: tabular-nums; }
+  .funnel-row .val b { font-size: 15px; }
+  ul { padding-left: 20px; }
+  li { margin: 6px 0; }
+  footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12.5px; }
+  .tag { display: inline-block; font-size: 11.5px; padding: 2px 8px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); margin-right: 6px; background: #fff; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="eyebrow">Case 02 · User Behavior Analytics</div>
+  <h1>淘宝用户行为分析报告</h1>
+  <p class="lede">
+    基于阿里云天池 UserBehavior 数据集，覆盖 2017-11-25 至 2017-12-03 共 9 天、1 亿条用户行为记录。
+    本报告回答四个问题：流量规模与节律、转化漏斗、留存可行性、商品与品类结构。
+  </p>
+  <div style="margin-top:16px">
+    <span class="tag">1.00 亿条行为</span>
+    <span class="tag">98.8 万用户</span>
+    <span class="tag">416 万商品</span>
+    <span class="tag">9,437 品类</span>
+  </div>
+</header>
+
+<div class="kpis">
+  <div class="kpi"><div class="label">日均浏览 PV</div><div class="value">996<span class="unit">万次</span></div></div>
+  <div class="kpi"><div class="label">日均访客 UV</div><div class="value">77.4<span class="unit">万人</span></div></div>
+  <div class="kpi"><div class="label">人均日浏览</div><div class="value">10.1<span class="unit">次</span></div></div>
+  <div class="kpi"><div class="label">浏览行为占比</div><div class="value">89.6<span class="unit">%</span></div></div>
+</div>
+
+<h2><span class="idx">01</span>流量规模与日趋势</h2>
+<p class="sub">柱为每日浏览量 PV，线为每日独立访客 UV（右轴）。</p>
+<div class="card">
+  <div id="trend"></div>
+  <div class="legend">
+    <span><i style="background:var(--accent)"></i>PV（万次）</span>
+    <span><i style="background:var(--warm);border-radius:50%"></i>UV（万人）</span>
+  </div>
+</div>
+
+<p>
+  11-25 至 12-01 流量相当平稳，PV 在 884~972 万之间波动；
+  <strong>12-02、12-03 两天同时跳升约 30%</strong>（PV 1,230 万 / 1,219 万，UV 97 万），是 9 天里唯一的高峰。
+  11-25 同为周六却无此跳升，说明这不是周末效应，更像是临近双 12 的预热拉动。
+</p>
+
+<table>
+  <thead><tr><th>日期</th><th>PV</th><th>UV</th><th>下单量</th></tr></thead>
+  <tbody id="daily-table"></tbody>
+</table>
+
+<h2><span class="idx">02</span>日内活跃节律</h2>
+<p class="sub">9 天累计，每小时浏览量占全天的比例。</p>
+<div class="card">
+  <div id="hourly"></div>
+</div>
+
+<p>
+  早 8 点开始爬升，10-18 点平稳（每小时约占 4.8%~5.4%）；
+  <strong>20-22 点是全天峰值</strong>，三小时合计占全天浏览的 24.1%、占全天订单的 20.7%，
+  其中 21 点单小时最高（8.41%）；凌晨 3-5 点最冷清（每小时不足 1%）。
+</p>
+
+<div class="takeaway">
+  <strong>运营建议：</strong>推送、秒杀、直播开场统一放在 19:30-21:00；凌晨 0-6 点不必配置人力与投放预算。
+</div>
+
+<h2><span class="idx">03</span>转化漏斗</h2>
+<p class="sub">用户去重口径：9 天内至少发生一次该阶段行为的人数。</p>
+<div class="card">
+  <div class="funnel-row">
+    <div class="name">浏览用户</div>
+    <div class="funnel-track"><div class="funnel-fill" style="width:100%;background:#3b6ea5"></div></div>
+    <div class="val"><b>984,105</b> 人 · 100%</div>
+  </div>
+  <div class="funnel-row">
+    <div class="name">加购 / 收藏用户</div>
+    <div class="funnel-track"><div class="funnel-fill" style="width:87.3%;background:#d98841"></div></div>
+    <div class="val"><b>859,275</b> 人 · 87.3%</div>
+  </div>
+  <div class="funnel-row">
+    <div class="name">购买用户</div>
+    <div class="funnel-track"><div class="funnel-fill" style="width:68.3%;background:#54a24b"></div></div>
+    <div class="val"><b>672,404</b> 人 · 68.3%</div>
+  </div>
+</div>
+
+<p>
+  意向到购买的环节转化率为 78.3%，即「一旦加购或收藏，八成会下单」。
+  每天的单日漏斗也稳定：加购率 45.6%~47.6%，购买率 18.5%~21.3%。
+  12-02、12-03 流量上涨 33%，但购买率反而从 19.3% 降到 18.5%——大促带来的是「逛的人」更多，转化效率被稀释。
+</p>
+
+<div class="note">
+  <strong>口径提醒：这个 68% 不能对外宣称是“淘宝转化率”。</strong>
+  真实电商「访问→下单」通常是个位数百分比。这份数据集是围绕购买行为筛选过的活跃用户样本，
+  绝对值只能做内部横向比较（品类之间、日期之间），不能外推到大盘。
+</div>
+
+<h2><span class="idx">04</span>留存：为什么这份数据做不了</h2>
+<p class="sub">每日活跃用户占全量 98.8 万用户的比例。</p>
+<div class="card">
+  <div id="coverage"></div>
+</div>
+
+<p>
+  按首活日构建 Cohort 留存矩阵时出现了反常：11-25 队列的 D7、D8 高达 98%，明显违背留存单调衰减的常识。
+  诊断后发现根因在数据采集本身——<strong>12-02、12-03 两天覆盖了全量用户的 98%，而前 7 天只有 72%~75%</strong>。
+  这份数据不是均匀采集 9 天，而是以最后两天为锚点、补齐了用户此前几天的历史行为。
+</p>
+
+<p>
+  因此留存曲线、复购率（55.1%）、复购间隔（中位 2 天）都会被系统性高估，<strong>本项目不输出留存与复购结论</strong>。
+  这也意味着：拿到任何一份行为数据，做留存之前都应该先检查「每日用户覆盖面」是否一致。
+</p>
+
+<h2><span class="idx">05</span>商品与品类结构</h2>
+<ul>
+  <li><strong>品类集中但不极端</strong>：9,437 个品类中，前 10 个占 28.1% 浏览，前 100 个占 62.7%，375 个（4%）贡献约 80% 流量。</li>
+  <li><strong>商品是极端长尾</strong>：416 万商品里，前 1% 贡献 36.4% 浏览、前 10% 贡献 76.5%；单个商品浏览中位数仅 3 次，均值 21.5 次。</li>
+  <li><strong>84.6% 的商品从未被购买过</strong>，长尾库存基本没有成交贡献。</li>
+</ul>
+
+<h3>两类「高流量低转化」商品，问题不一样</h3>
+<table>
+  <thead><tr><th>类型</th><th>典型表现</th><th>可能原因</th></tr></thead>
+  <tbody>
+    <tr><td>无加购型</td><td>1.6 万浏览、加购率 &lt;0.05%、零成交</td><td>曝光不精准、标题主图与内容不符</td></tr>
+    <tr><td>有加购无成交型</td><td>6,465 浏览、191 次加购、0 购买</td><td>价格、库存、运费或支付环节</td></tr>
+  </tbody>
+</table>
+
+<div class="note">
+  <strong>分析边界：</strong>数据没有价格与金额字段，因此无法计算 GMV、客单价、价格带贡献。
+  本报告只讨论流量驱动的转化结构，相关结论不应延伸到销售额层面。
+</div>
+
+<h2><span class="idx">06</span>数据处理中的三个坑</h2>
+<ul>
+  <li><strong>时区偏移 8 小时</strong>：原始 timestamp 是北京时间戳，按 UTC 解析会让「几点最活跃」整体前移 8 小时。已在清洗阶段统一 +8h。</li>
+  <li><strong>5.5 万条越界脏数据</strong>：时间戳最早到 1902 年、最晚到 2037 年，不过滤会把「9 天」算成 212 天。已按官方区间剔除（100,150,807 → 100,095,231 行）。</li>
+  <li><strong>采集窗口偏差</strong>：最后两天覆盖几乎所有用户，导致所有跨天指标失真（见第 4 节）。</li>
+</ul>
+
+<h2><span class="idx">07</span>结论</h2>
+<ol>
+  <li><strong>流量</strong>：日均 PV 996 万、日均 UV 77.4 万；20-22 点是黄金时段，占全天浏览近四分之一。</li>
+  <li><strong>转化</strong>：样本内浏览→购买 68.3%，意向→购买 78.3%；样本被购买行为筛选过，绝对值不可外推。</li>
+  <li><strong>留存</strong>：受采集偏差影响，不可用；正确做法是先验证每日覆盖一致性。</li>
+  <li><strong>结构</strong>：流量向少数品类集中，商品端长尾极长；优化重点应放在「高流量低转化」的两类坑位商品上。</li>
+</ol>
+
+<footer>
+  数据来源：阿里云天池《淘宝用户购物行为数据集》（UserBehavior，2017-11-25 ~ 2017-12-03）&nbsp;·&nbsp;
+  分析代码：<code>淘宝天猫用户行为分析/</code> 下的 5 个 Notebook &nbsp;·&nbsp;
+  报告生成：2026-11-17
+</footer>
+
+</div>
+
+<script>
+const D = {
+  dates: ["11-25","11-26","11-27","11-28","11-29","11-30","12-01","12-02","12-03"],
+  pv: [9353423, 9567423, 9041187, 8842933, 9210821, 9358998, 9718959, 12329644, 12193822],
+  uv: [706641, 715516, 710094, 709257, 718922, 730597, 740139, 970401, 966977],
+  orders: [210073, 214314, 202485, 197891, 206356, 209672, 217048, 258225, 255971],
+  hourly: [1.58,1.01,0.80,0.63,0.55,0.65,0.99,1.60,2.75,4.23,5.24,5.31,4.98,5.18,5.36,5.28,5.17,4.96,4.83,5.90,7.35,8.41,8.30,5.66],
+  coverage: [71.5,72.4,71.9,71.8,72.8,73.9,74.9,98.2,97.9]
+};
+
+const NS = "http://www.w3.org/2000/svg";
+const fmt = n => n.toLocaleString("en-US");
+
+function el(name, attrs, text) {
+  const node = document.createElementNS(NS, name);
+  for (const k in attrs) node.setAttribute(k, attrs[k]);
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function renderTrend() {
+  const W = 900, H = 320, L = 64, R = 62, T = 24, B = 42;
+  const pw = W - L - R, ph = H - T - B;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}` });
+  const pvMax = Math.ceil(Math.max(...D.pv) / 2000000) * 2000000;
+  const uvMin = 650000, uvMax = 1000000;
+  const yPV = v => T + ph - (v / pvMax) * ph;
+  const yUV = v => T + ph - ((v - uvMin) / (uvMax - uvMin)) * ph;
+  const x = i => L + (pw / D.dates.length) * (i + 0.5);
+
+  for (let i = 0; i <= 4; i++) {
+    const y = T + (ph / 4) * i;
+    svg.appendChild(el("line", { x1: L, y1: y, x2: L + pw, y2: y, stroke: "#eee9e2" }));
+    svg.appendChild(el("text", {
+      x: L - 10, y: y + 4, "text-anchor": "end", "font-size": 11, fill: "#8a8a8a"
+    }, Math.round(pvMax * (1 - i / 4) / 10000) + "万"));
+    svg.appendChild(el("text", {
+      x: L + pw + 10, y: y + 4, "font-size": 11, fill: "#8a8a8a"
+    }, Math.round((uvMax - (uvMax - uvMin) * i / 4) / 10000) + "万"));
+  }
+
+  const bw = Math.min(44, pw / D.dates.length * 0.52);
+  D.pv.forEach((v, i) => {
+    const y = yPV(v);
+    svg.appendChild(el("rect", {
+      x: x(i) - bw / 2, y: y, width: bw, height: T + ph - y,
+      fill: "#3b6ea5", rx: 3, opacity: 0.9
+    }));
+    svg.appendChild(el("text", {
+      x: x(i), y: T + ph + 22, "text-anchor": "middle", "font-size": 11, fill: "#6b6b6b"
+    }, D.dates[i]));
+  });
+
+  const pts = D.uv.map((v, i) => `${x(i)},${yUV(v)}`).join(" ");
+  svg.appendChild(el("polyline", {
+    points: pts, fill: "none", stroke: "#d98841", "stroke-width": 2.4,
+    "stroke-linejoin": "round", "stroke-linecap": "round"
+  }));
+  D.uv.forEach((v, i) => {
+    svg.appendChild(el("circle", { cx: x(i), cy: yUV(v), r: 4, fill: "#fff", stroke: "#d98841", "stroke-width": 2 }));
+  });
+
+  document.getElementById("trend").appendChild(svg);
+}
+
+function renderHourly() {
+  const W = 900, H = 260, L = 42, R = 12, T = 18, B = 34;
+  const pw = W - L - R, ph = H - T - B;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}` });
+  const max = 9;
+  const y = v => T + ph - (v / max) * ph;
+  const step = pw / 24;
+
+  [0, 3, 6, 9].forEach(v => {
+    svg.appendChild(el("line", { x1: L, y1: y(v), x2: L + pw, y2: y(v), stroke: "#eee9e2" }));
+    svg.appendChild(el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "#8a8a8a" }, v + "%"));
+  });
+
+  D.hourly.forEach((v, h) => {
+    const peak = h >= 20 && h <= 22;
+    const bx = L + step * h + step * 0.16;
+    const bw = step * 0.68;
+    svg.appendChild(el("rect", {
+      x: bx, y: y(v), width: bw, height: T + ph - y(v),
+      fill: peak ? "#d98841" : "#9fbed9", rx: 2
+    }));
+    if (h % 3 === 0) {
+      svg.appendChild(el("text", {
+        x: bx + bw / 2, y: T + ph + 20, "text-anchor": "middle", "font-size": 11, fill: "#6b6b6b"
+      }, h + "时"));
+    }
+  });
+
+  document.getElementById("hourly").appendChild(svg);
+}
+
+function renderCoverage() {
+  const W = 900, H = 240, L = 46, R = 12, T = 18, B = 34;
+  const pw = W - L - R, ph = H - T - B;
+  const svg = el("svg", { viewBox: `0 0 ${W} ${H}` });
+  const y = v => T + ph - (v / 100) * ph;
+  const step = pw / D.coverage.length;
+
+  [0, 25, 50, 75, 100].forEach(v => {
+    svg.appendChild(el("line", { x1: L, y1: y(v), x2: L + pw, y2: y(v), stroke: "#eee9e2" }));
+    svg.appendChild(el("text", { x: L - 8, y: y(v) + 4, "text-anchor": "end", "font-size": 11, fill: "#8a8a8a" }, v + "%"));
+  });
+
+  D.coverage.forEach((v, i) => {
+    const bx = L + step * i + step * 0.18;
+    const bw = step * 0.64;
+    const anomaly = v > 90;
+    svg.appendChild(el("rect", {
+      x: bx, y: y(v), width: bw, height: T + ph - y(v),
+      fill: anomaly ? "#b4493f" : "#9fbed9", rx: 2, opacity: 0.9
+    }));
+    svg.appendChild(el("text", {
+      x: bx + bw / 2, y: y(v) - 6, "text-anchor": "middle", "font-size": 10.5,
+      fill: anomaly ? "#b4493f" : "#6b6b6b"
+    }, v + "%"));
+    svg.appendChild(el("text", {
+      x: bx + bw / 2, y: T + ph + 20, "text-anchor": "middle", "font-size": 11, fill: "#6b6b6b"
+    }, D.dates[i]));
+  });
+
+  document.getElementById("coverage").appendChild(svg);
+}
+
+function renderTable() {
+  const tbody = document.getElementById("daily-table");
+  D.dates.forEach((d, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td>${d}</td><td>${fmt(D.pv[i])}</td><td>${fmt(D.uv[i])}</td><td>${fmt(D.orders[i])}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+renderTrend();
+renderHourly();
+renderCoverage();
+renderTable();
+</script>
+</body>
+</html>
